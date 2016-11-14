@@ -1,3 +1,7 @@
+import Data.Char
+
+type Bit = Int
+
 -- Q1
 questionOne :: (a -> b) -> (a -> Bool) -> [a] -> [b]
 questionOne f p xs = map f (filter p xs)
@@ -44,3 +48,25 @@ filter' p = foldr (\x xs -> if p x then x : xs else xs) []
 -}
 dec2int :: [Int] -> Int
 dec2int = foldl (\x y -> 10*x + y) 0
+
+-- Q5
+curry' :: ((a,b) -> c) -> (a -> b -> c)
+curry' f = \x y -> f (x,y)
+
+uncurry' :: (a -> b -> c) -> ((a,b) -> c)
+uncurry' f = \(x,y) -> f x y
+
+-- Q6
+unfold :: (a -> Bool) -> (a -> b) -> (a -> a) -> a -> [b]
+unfold p h t x
+    | p x       = []
+    | otherwise = h x : unfold p h t (t x)
+
+int2bin :: Int -> [Bit]
+int2bin = unfold (== 0) (`mod` 2) (`div` 2)
+
+chop8 :: [Bit] -> [[Bit]]
+chop8 = unfold (null) (take 8) (drop 8)
+
+map'' :: (a -> b) -> [a] -> [b]
+map'' f = unfold (null) (f . head) tail
