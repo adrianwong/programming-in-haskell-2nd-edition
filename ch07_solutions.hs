@@ -70,3 +70,56 @@ chop8 = unfold (null) (take 8) (drop 8)
 
 map'' :: (a -> b) -> [a] -> [b]
 map'' f = unfold (null) (f . head) tail
+
+iterate' :: (a -> a) -> a -> [a]
+iterate' f = unfold (const False) id f
+
+-- Q7
+bin2int :: [Bit] -> Int
+bin2int = foldr (\x y -> x + 2*y) 0
+
+make8 :: [Bit] -> [Bit]
+make8 bits = take 8 (bits ++ repeat 0)
+
+transmit :: String -> String
+transmit = decode . channel . encode
+
+channel :: [Bit] -> [Bit]
+channel = id
+
+-- Compute the parity bit
+computeParity :: [Bit] -> Bit
+computeParity bits = sum bits `mod` 2
+
+-- Append parity bit to bit list
+addParityBit :: [Bit] -> [Bit]
+addParityBit bits = (computeParity bits) : bits
+
+-- Check parity bit
+checkParityBit :: [Bit] -> [Bit]
+checkParityBit (x:xs)
+    | x == (computeParity xs) = xs
+    | otherwise               = error "Parity failure!"
+
+-- Add parity bit during the encode phase
+encode :: String -> [Bit]
+encode = concat . map (addParityBit . make8 . int2bin . ord)
+
+-- Check parity bit during the decode phase
+decode :: [Bit] -> String
+decode =  map (chr . bin2int . checkParityBit) . chop9
+
+-- Chopping 9 bits instead of 8 because of parity bit
+chop9 :: [Bit] -> [[Bit]]
+chop9 = unfold (null) (take 9) (drop 9)
+
+-- Q8
+faultyChannel :: [Bit] -> [Bit]
+faultyChannel bits = tail bits
+
+-- Call this instead of 'tramsit' to test failure case
+faultyTransmit :: String -> String
+faultyTransmit = decode . faultyChannel . encode
+
+-- Q9
+-- altMap :: (a -> b) -> (a -> b) -> [a] -> [b]
