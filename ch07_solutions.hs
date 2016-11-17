@@ -122,4 +122,15 @@ faultyTransmit :: String -> String
 faultyTransmit = decode . faultyChannel . encode
 
 -- Q9
--- altMap :: (a -> b) -> (a -> b) -> [a] -> [b]
+altMap :: (a -> b) -> (a -> b) -> [a] -> [b]
+altMap f g []       = []
+altMap f g (x:[])   = f x : []
+altMap f g (x:y:xs) = f x : g y : altMap f g xs
+
+-- Q10
+luhnDouble :: Int -> Int
+luhnDouble x = if n < 10 then n else n - 9
+               where n = x*2
+
+luhn :: [Int] -> Bool
+luhn xs = sum (altMap luhnDouble id xs) `mod` 10 == 0
