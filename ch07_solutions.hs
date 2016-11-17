@@ -132,5 +132,8 @@ luhnDouble :: Int -> Int
 luhnDouble x = if n < 10 then n else n - 9
                where n = x*2
 
+mod10NoRemainder :: Integral a => a -> Bool
+mod10NoRemainder x = (mod x 10) == 0
+
 luhn :: [Int] -> Bool
-luhn xs = sum (altMap luhnDouble id xs) `mod` 10 == 0
+luhn = mod10NoRemainder . sum . (altMap luhnDouble id)
