@@ -37,3 +37,26 @@ balance :: [a] -> Tree' a
 balance [x] = Leaf' x
 balance xs  = Node' (balance ys) (balance zs)
               where (ys,zs) = halveList xs
+
+-- Q5
+data Expr = Val Int | Add Expr Expr
+folde :: (Int -> a) -> (a -> a -> a) -> Expr -> a
+folde f g (Val x)   = f x
+folde f g (Add x y) = g (folde f g x) (folde f g y)
+
+-- Q6
+{- test:
+   eval (Add (Val 2) (Val 7)) == 9
+   eval (Add (Add (Val 2) (Val 7)) (Val 9)) == 18
+   eval (Add (Add (Val 2) (Val 7)) (Add (Val 3) (Val 9))) == 21
+-}
+eval :: Expr -> Int
+eval x = folde id (+) x
+
+{- test:
+   size (Add (Val 2) (Val 7)) == 2
+   size (Add (Add (Val 2) (Val 7)) (Val 9)) == 3
+   size (Add (Add (Val 2) (Val 7)) (Add (Val 3) (Val 9))) == 4
+-}
+size :: Expr -> Int
+size x = folde (\_ -> 1) (+) x
