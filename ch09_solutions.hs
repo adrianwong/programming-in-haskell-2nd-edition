@@ -7,10 +7,24 @@ instance Show Op where
     show Div = "/"
 
 valid :: Op -> Int -> Int -> Bool
+
+-- Use for Q4 (Part 2)
+-- valid Add _ _ = True
+-- valid Sub x y = x > y
+-- valid Mul _ _ = True
+-- valid Div x y = x `mod` y == 0
+
+-- Use for Q5
 valid Add _ _ = True
-valid Sub x y = x > y
+valid Sub _ _ = True
 valid Mul _ _ = True
-valid Div x y = x `mod` y == 0
+valid Div x y = y /= 0 && x `mod` y == 0
+
+-- Use for original (optimised) program
+-- valid Add x y = x <= y
+-- valid Sub x y = x > y
+-- valid Mul x y = x /= 1 && y /= 1 && x < y
+-- valid Div x y = y /= 1 && x `mod` y == 0
 
 apply :: Op -> Int -> Int -> Int
 apply Add x y = x + y
@@ -51,7 +65,9 @@ perms []     = [[]]
 perms (x:xs) = concat (map (interleave x) (perms xs))
 
 choices :: [a] -> [[a]]
-choices = concat . map perms . subs
+-- choices = concat . map perms . subs
+-- Q1
+choices xs = [zs | ys <- subs xs, zs <- perms ys]
 
 solution :: Expr -> [Int] -> Int -> Bool
 solution e ns n =
@@ -79,5 +95,52 @@ ops = [Add,Sub,Mul,Div]
 solutions :: [Int] -> Int -> [Expr]
 solutions ns n = [e | ns' <- choices ns, e <- exprs ns', eval e == [n]]
 
+type Result = (Expr,Int)
+
+results :: [Int] -> [Result]
+results []  = []
+results [n] = [(Val n,n) | n > 0]
+results ns  = [res | (ls,rs) <- split ns,
+                      lx     <- results ls,
+                      ry     <- results rs,
+                      res    <- combine' lx ry]
+
+combine' :: Result -> Result -> [Result]
+combine' (l,x) (r,y) =
+    [(App o l r, apply o x y) | o <- ops, valid o x y]
+
+solutions' :: [Int]-> Int -> [Expr]
+solutions' ns n =
+    [e | ns' <- choices ns, (e,m) <- results ns', m == n]
+
+-- Q2
+isChoice :: Eq a => [a] -> [a] -> Bool
+isChoice [] _      = True
+isChoice (x:xs) [] = False
+isChoice (x:xs) ys = elem x ys
+    && isChoice xs (removeFirstOccurrence x ys)
+
+removeFirstOccurrence :: Eq a => a -> [a] -> [a]
+removeFirstOccurrence x [] = []
+removeFirstOccurrence x (y:ys)
+    | x == y    = ys
+    | otherwise = y : removeFirstOccurrence x ys
+
+-- Q3
+-- Function will not terminate?
+
+-- Q4 (Part 1)
+allExprs :: [Int] -> [Expr]
+allExprs ns = [e | ns' <- choices ns, e <- exprs ns']
+
+possibleExprs :: [Int] -> Int
+possibleExprs = length . allExprs
+
+-- Q4 (Part 2) and Q5
+-- Same function is called, but definition of 'valid' is different
+-- This one takes a while to compute!
+successfulExprs :: [Int] -> Int
+successfulExprs = length . filter (not . null) . map eval . allExprs
+
 main :: IO ()
-main = print (solutions [1,3,7,10,25,50] 765)
+main = print (solutions' [1,3,7,10,25,50] 765)
