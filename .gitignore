@@ -1,0 +1,8 @@
+# Ignore all
+*
+
+# Un-ignore files with these extensions
+!.gitignore
+!*.hs
+!*.md
+
