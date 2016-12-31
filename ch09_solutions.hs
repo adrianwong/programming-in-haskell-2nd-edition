@@ -1,12 +1,24 @@
-data Op = Add | Sub | Mul | Div
+import Data.List (sortBy)
+import Data.List (groupBy)
+import Data.Function (on)
+import Data.Ord (comparing)
+
+data Op = Add | Sub | Mul | Div | Exp -- Q6a
 
 instance Show Op where
     show Add = "+"
     show Sub = "-"
     show Mul = "*"
     show Div = "/"
+    show Exp = "^" -- Q6a
 
 valid :: Op -> Int -> Int -> Bool
+
+-- Use for original (optimised) program
+-- valid Add x y = x <= y
+-- valid Sub x y = x > y
+-- valid Mul x y = x /= 1 && y /= 1 && x < y
+-- valid Div x y = y /= 1 && x `mod` y == 0
 
 -- Use for Q4 (Part 2)
 -- valid Add _ _ = True
@@ -15,22 +27,24 @@ valid :: Op -> Int -> Int -> Bool
 -- valid Div x y = x `mod` y == 0
 
 -- Use for Q5
-valid Add _ _ = True
-valid Sub _ _ = True
-valid Mul _ _ = True
-valid Div x y = y /= 0 && x `mod` y == 0
+-- valid Add _ _ = True
+-- valid Sub _ _ = True
+-- valid Mul _ _ = True
+-- valid Div x y = y /= 0 && x `mod` y == 0
 
--- Use for original (optimised) program
--- valid Add x y = x <= y
--- valid Sub x y = x > y
--- valid Mul x y = x /= 1 && y /= 1 && x < y
--- valid Div x y = y /= 1 && x `mod` y == 0
+-- Use for Q6a
+valid Add x y = x <= y
+valid Sub x y = x > y
+valid Mul x y = x /= 1 && y /= 1 && x < y
+valid Div x y = y /= 1 && x `mod` y == 0
+valid Exp x y = x /= 1 && y > 1
 
 apply :: Op -> Int -> Int -> Int
 apply Add x y = x + y
 apply Sub x y = x - y
 apply Mul x y = x * y
 apply Div x y = x `div` y
+apply Exp x y = x ^ y -- Q6a
 
 data Expr = Val Int | App Op Expr Expr
 
@@ -90,7 +104,8 @@ combine :: Expr -> Expr -> [Expr]
 combine l r = [App o l r | o <- ops]
 
 ops :: [Op]
-ops = [Add,Sub,Mul,Div]
+-- ops = [Add,Sub,Mul,Div]
+ops = [Add,Sub,Mul,Div,Exp] -- Q6a
 
 solutions :: [Int] -> Int -> [Expr]
 solutions ns n = [e | ns' <- choices ns, e <- exprs ns', eval e == [n]]
@@ -142,5 +157,30 @@ possibleExprs = length . allExprs
 successfulExprs :: [Int] -> Int
 successfulExprs = length . filter (not . null) . map eval . allExprs
 
-main :: IO ()
-main = print (solutions' [1,3,7,10,25,50] 765)
+-- Q6b
+{- Helper function that calculates the value
+difference between the expression and the number 'n' -}
+valueDiff :: [Int] -> Int -> [(Expr,Int)]
+valueDiff ns n = [(e, abs (m-n)) | ns' <- choices ns, (e,m) <- results ns']
+
+groupSolnsByDiff :: [(Expr,Int)] -> [(Expr,Int)]
+groupSolnsByDiff = concat
+                 . take 1 -- Take first element, which will be lowest diff group
+                 . groupBy (on (==) snd) -- Group diffs of same value
+                 . sortBy (comparing snd) -- Sort by increasing order of diffs
+
+closestSolns :: [Int] -> Int -> [Expr]
+closestSolns ns n = [e | (e,_) <- groupSolnsByDiff (valueDiff ns n)]
+
+-- Q6c
+-- Complexity determined by assigning a Fibonacci value to an operation
+exprComplexity :: Expr -> Int
+exprComplexity (Val n)       = 0
+exprComplexity (App Add l r) = 1 + exprComplexity l + exprComplexity r
+exprComplexity (App Sub l r) = 2 + exprComplexity l + exprComplexity r
+exprComplexity (App Mul l r) = 3 + exprComplexity l + exprComplexity r
+exprComplexity (App Div l r) = 5 + exprComplexity l + exprComplexity r
+exprComplexity (App Exp l r) = 8 + exprComplexity l + exprComplexity r
+
+sortedClosestSolns :: [Int] -> Int -> [Expr]
+sortedClosestSolns ns n = sortBy (comparing exprComplexity) (closestSolns ns n)
