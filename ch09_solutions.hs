@@ -1,5 +1,4 @@
-import Data.List (sortBy)
-import Data.List (groupBy)
+import Data.List (sortBy, groupBy)
 import Data.Function (on)
 import Data.Ord (comparing)
 
@@ -159,18 +158,19 @@ successfulExprs = length . filter (not . null) . map eval . allExprs
 
 -- Q6b
 {- Helper function that calculates the value
-difference between the expression and the number 'n' -}
-valueDiff :: [Int] -> Int -> [(Expr,Int)]
-valueDiff ns n = [(e, abs (m-n)) | ns' <- choices ns, (e,m) <- results ns']
+difference between the expression and the number 'n'
+and stores the expression and its difference in a tuple -}
+calcExprDiffTuple :: [Int] -> Int -> [(Expr,Int)]
+calcExprDiffTuple ns n = [(e, abs (m-n)) | ns' <- choices ns, (e,m) <- results ns']
 
-groupSolnsByDiff :: [(Expr,Int)] -> [(Expr,Int)]
-groupSolnsByDiff = concat
+lowestDiffSolns :: [(Expr,Int)] -> [(Expr,Int)]
+lowestDiffSolns = concat
                  . take 1 -- Take first element, which will be lowest diff group
                  . groupBy (on (==) snd) -- Group diffs of same value
                  . sortBy (comparing snd) -- Sort by increasing order of diffs
 
 closestSolns :: [Int] -> Int -> [Expr]
-closestSolns ns n = [e | (e,_) <- groupSolnsByDiff (valueDiff ns n)]
+closestSolns ns n = map fst (lowestDiffSolns (calcExprDiffTuple ns n))
 
 -- Q6c
 -- Complexity determined by assigning a Fibonacci value to an operation
