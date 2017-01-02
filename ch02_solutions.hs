@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch02 where
+
 -- Q5
 init' [] = []
 init' xs = take (length xs - 1) xs

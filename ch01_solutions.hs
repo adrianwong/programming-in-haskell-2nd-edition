@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch01 where
+
 -- Q4
 -- Swap occurrences of 'smaller' and 'larger'
 qsort []     = []

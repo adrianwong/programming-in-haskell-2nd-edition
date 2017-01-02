@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch04 where
+
 -- Q5
 func :: Bool -> Bool -> Bool
 func a b = if a then

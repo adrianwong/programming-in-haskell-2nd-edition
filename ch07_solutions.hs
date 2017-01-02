@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch07 where
+
 import Data.Char
 
 type Bit = Int

@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch05 where
+
 import Data.Char
 
 -- Q6

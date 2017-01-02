@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch03 where
+
 -- Q3
 second :: [a] -> a
 second xs = head (tail xs)

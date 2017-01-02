@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch08 where
+
 -- Q1
 data Nat = Zero | Succ Nat
 

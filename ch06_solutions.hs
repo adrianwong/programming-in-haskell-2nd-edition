@@ -1,3 +1,5 @@
+module ProgrammingInHaskell_Ch06 where
+
 -- Q6a
 and' :: [Bool] -> Bool
 and' []     = True
