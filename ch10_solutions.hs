@@ -79,3 +79,21 @@ nim = play initial 1
 -- Q1
 putStr' :: String -> IO ()
 putStr' xs = sequence_ [putChar x | x <- xs]
+
+-- Q4
+adder' :: Int -> Int -> IO Int
+adder' t n = do x <- getDigit ""
+                if n == 1 then
+                    return (t+x)
+                else
+                    adder' (t+x) (n-1)
+
+adder :: IO ()
+adder = do n <- getDigit "How many numbers? "
+           if n < 1 then
+               do putStrLn "ERROR: Value has to be > 0"
+                  adder
+           else
+               do total <- adder' 0 n
+                  putStr "The total is "
+                  putStrLn (show total)
