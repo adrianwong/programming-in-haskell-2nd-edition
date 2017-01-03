@@ -97,3 +97,17 @@ adder = do n <- getDigit "How many numbers? "
                do total <- adder' 0 n
                   putStr "The total is "
                   putStrLn (show total)
+
+-- Q5
+adderSequence' :: Int -> IO [Int]
+adderSequence' n = sequence [getDigit x | (x,_) <- zip (repeat "") [1..n]]
+
+adderSequence :: IO ()
+adderSequence = do n <- getDigit "How many numbers? "
+                   if n < 1 then
+                       do putStrLn "ERROR: Value has to be > 0"
+                          adderSequence
+                   else
+                       do numberList <- adderSequence' n
+                          putStr "The total is "
+                          putStrLn (show (sum numberList))
