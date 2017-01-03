@@ -1,6 +1,7 @@
 module ProgrammingInHaskell_Ch10 where
 
 import Data.Char (isDigit, digitToInt)
+import System.IO (hSetEcho, stdin)
 
 next :: Int -> Int
 next 1 = 2
@@ -111,3 +112,34 @@ adderSequence = do n <- getDigit "How many numbers? "
                        do numberList <- adderSequence' n
                           putStr "The total is "
                           putStrLn (show (sum numberList))
+
+-- Q6
+-- From 10.6 Hangman
+getCh :: IO Char
+getCh = do hSetEcho stdin False
+           x <- getChar
+           hSetEcho stdin True
+           return x
+
+-- Handle edge case where \DEL is pressed when string is already empty
+safeInit :: [a] -> [a]
+safeInit []     = []
+safeInit [_]    = []
+safeInit (x:xs) = x : safeInit xs
+
+readLine' :: String -> IO String
+readLine' cs = do c <- getCh
+                  if c == '\n' then
+                      do putChar c
+                         return cs
+                  else if c == '\DEL' then
+                      do putChar '\b' -- Move cursor back one space
+                         putChar ' '  -- Erase character with empty space
+                         putChar '\b' -- Move cursor back one space again
+                         readLine' (safeInit cs)
+                  else
+                      do putChar c
+                         readLine' (cs ++ [c])
+
+readLine :: IO String
+readLine = readLine' []
