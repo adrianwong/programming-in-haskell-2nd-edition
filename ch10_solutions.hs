@@ -27,11 +27,16 @@ putRow row num = do putStr (show row)
                     putStrLn (concat (replicate num "* "))
 
 putBoard :: Board -> IO ()
-putBoard [a,b,c,d,e] = do putRow 1 a
-                          putRow 2 b
-                          putRow 3 c
-                          putRow 4 d
-                          putRow 5 e
+-- Q2
+-- putBoard = putBoard' 1
+-- Q3
+putBoard xs = sequence_ [putRow n x | (n,x) <- zip [1..] xs]
+
+-- Q2
+putBoard' :: Int -> Board -> IO ()
+putBoard' row []     = return ()
+putBoard' row (x:xs) = do putRow row x
+                          putBoard' (row+1) xs
 
 newline :: IO ()
 newline = putChar '\n'
