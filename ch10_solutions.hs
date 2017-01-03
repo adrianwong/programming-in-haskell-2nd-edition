@@ -100,7 +100,7 @@ adder = do n <- getDigit "How many numbers? "
 
 -- Q5
 adderSequence' :: Int -> IO [Int]
-adderSequence' n = sequence [getDigit x | (x,_) <- zip (repeat "") [1..n]]
+adderSequence' n = sequence (replicate n (getDigit ""))
 
 adderSequence :: IO ()
 adderSequence = do n <- getDigit "How many numbers? "
