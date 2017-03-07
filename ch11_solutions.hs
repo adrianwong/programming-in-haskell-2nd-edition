@@ -3,6 +3,7 @@ module Main where
 import Data.Char
 import Data.List
 import System.IO
+import System.Random (randomRIO)
 
 size :: Int
 size = 3
@@ -119,6 +120,15 @@ data Tree a = Node a [Tree a]
 gametree :: Grid -> Player -> Tree Grid
 gametree g p = Node g [gametree g' (next p) | g' <- moves g p]
 
+-- Q1a
+numNodes :: Tree Grid -> Int
+numNodes (Node _ ts) = 1 + sum (map numNodes ts)
+
+-- Q1b
+maxDepth :: Tree Grid -> Int
+maxDepth (Node _ []) = 0
+maxDepth (Node _ ts) = 1 + maximum (map maxDepth ts)
+
 moves :: Grid -> Player -> [Grid]
 moves g p
     | won g     = []
@@ -144,11 +154,22 @@ minimax (Node g ts)
                         ts' = map minimax ts
                         ps = [p | Node (_,p) _ <- ts']
 
+-- Might as well make use of 'bestmoves' from Q2
 bestmove :: Grid -> Player -> Grid
-bestmove g p = head [g' | Node (g',p') _ <- ts, p' == best]
-               where
-                   tree = prune depth (gametree g p)
-                   Node (_,best) ts = minimax tree
+bestmove g p = head $ bestmoves g p
+
+-- Q2
+bestmoves :: Grid -> Player -> [Grid]
+bestmoves g p = [g' | Node (g',p') _ <- ts, p' == best]
+                where
+                    tree = prune depth (gametree g p)
+                    Node (_,best) ts = minimax tree
+
+randBestMove :: Grid -> Player -> IO Grid
+randBestMove g p = do
+    let bs = bestmoves g p
+    n <- randomRIO (0, length bs - 1)
+    return $ bs !! n
 
 play :: Grid -> Player -> IO ()
 play g p = do cls
@@ -167,7 +188,9 @@ play' g p
                                    play' g p
                         [g'] -> play g' (next p)
     | p == X   = do putStr "Player X is thinking... "
-                    (play $! (bestmove g p)) (next p)
+                    -- Q2
+                    randBest <- randBestMove g p
+                    (play $! randBest) (next p)
 
 main :: IO ()
 main = do hSetBuffering stdout NoBuffering
