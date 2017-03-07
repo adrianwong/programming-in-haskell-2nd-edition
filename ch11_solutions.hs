@@ -144,9 +144,9 @@ depth = 9
 
 minimax :: Tree Grid -> Tree (Grid,Player)
 minimax (Node g [])
-    | wins O g = Node (g,O) []
-    | wins X g = Node (g,X) []
-    |otherwise = Node (g,B) []
+    | wins O g  = Node (g,O) []
+    | wins X g  = Node (g,X) []
+    | otherwise = Node (g,B) []
 minimax (Node g ts)
     | turn g == O = Node (g, minimum ps) ts'
     | turn g == X = Node (g, maximum ps) ts'
