@@ -194,4 +194,9 @@ play' g p
 
 main :: IO ()
 main = do hSetBuffering stdout NoBuffering
-          play empty O
+          putStr "Go first? (y/n): "
+          ans <- getLine
+          if ans == "y" then
+              play empty O
+          else
+              play empty X
