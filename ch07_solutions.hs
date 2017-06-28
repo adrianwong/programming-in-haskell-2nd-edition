@@ -5,8 +5,8 @@ import Data.Char
 type Bit = Int
 
 -- Q1
-questionOne :: (a -> b) -> (a -> Bool) -> [a] -> [b]
-questionOne f p xs = map f (filter p xs)
+listComp :: (a -> b) -> (a -> Bool) -> [a] -> [b]
+listComp f p xs = map f (filter p xs)
 
 -- Q2a
 {- Question appears to be incorrect. A predicate of type (a -> Bool) cannot
