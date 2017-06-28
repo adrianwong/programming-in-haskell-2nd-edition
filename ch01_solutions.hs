@@ -9,7 +9,7 @@ qsort (x:xs) = qsort larger ++ [x] ++ qsort smaller
                    larger  = [b | b <- xs, b > x]
 
 -- Q5
--- Duplicates will be removed from the sorted list
+-- Answer: Duplicates are removed from the sorted list
 qsort' []     = []
 qsort' (x:xs) = qsort' smaller ++ [x] ++ qsort' larger
                 where
