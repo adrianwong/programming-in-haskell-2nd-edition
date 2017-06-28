@@ -120,7 +120,7 @@ chop9 = unfold (null) (take 9) (drop 9)
 faultyChannel :: [Bit] -> [Bit]
 faultyChannel bits = tail bits
 
--- Call this instead of 'tramsit' to test failure case
+-- Call this instead of 'transmit' to test failure case
 faultyTransmit :: String -> String
 faultyTransmit = decode . faultyChannel . encode
 
