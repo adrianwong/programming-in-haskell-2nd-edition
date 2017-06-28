@@ -3,13 +3,13 @@ module ProgrammingInHaskell_Ch08 where
 -- Q1
 data Nat = Zero | Succ Nat
 
-add' :: Nat -> Nat -> Nat
-add' Zero n     = n
-add' (Succ m) n = Succ (add' m n)
+add :: Nat -> Nat -> Nat
+add Zero n     = n
+add (Succ m) n = Succ (add m n)
 
-mult' :: Nat -> Nat -> Nat
-mult' m Zero     = Zero
-mult' m (Succ n) = add' m (mult' m n)
+mult :: Nat -> Nat -> Nat
+mult m Zero     = Zero
+mult m (Succ n) = add m (mult m n)
 
 -- Q2
 data Tree a = Leaf a | Node (Tree a) a (Tree a)
