@@ -3,6 +3,7 @@ module Main where
 import Data.Char
 import Data.List
 import System.IO
+import System.Random (randomRIO)
 
 size :: Int
 size = 3
@@ -167,8 +168,62 @@ play' g p
                                    play' g p
                         [g'] -> play g' (next p)
     | p == X   = do putStr "Player X is thinking... "
-                    (play $! (bestmove g p)) (next p)
+                    -- Q2
+                    randBest <- randBestMove g p
+                    (play $! randBest) (next p)
+
+                    -- Original implementation
+                    -- (play $! (bestmove g p)) (next p)
 
 main :: IO ()
 main = do hSetBuffering stdout NoBuffering
-          play empty O
+          -- Q4a
+          promptYesNo "Go first? (y/n): "
+
+          -- Original implementation
+          -- play empty O
+
+-- Q1a
+numNodes :: Tree Grid -> Int
+numNodes (Node _ ts) = 1 + sum (map numNodes ts)
+
+-- Q1b
+maxDepth :: Tree Grid -> Int
+maxDepth (Node _ []) = 0
+maxDepth (Node _ ts) = 1 + maximum (map maxDepth ts)
+
+-- Q2
+-- Return the entire list, not just its head
+bestmoves :: Grid -> Player -> [Grid]
+bestmoves g p = [g' | Node (g',p') _ <- ts, p' == best]
+                where
+                    tree = prune depth (gametree g p)
+                    Node (_,best) ts = minimax tree
+
+-- Helper function to return a randomised best move
+-- wrapped in the IO monad
+randBestMove :: Grid -> Player -> IO Grid
+randBestMove g p = do
+    let bs = bestmoves g p
+    n <- randomRIO (0, length bs - 1)
+    return $ bs !! n
+
+-- Q3
+-- TODO
+
+-- Q4a
+promptYesNo :: String -> IO ()
+promptYesNo prompt = do
+    putStr prompt
+    ans <- getChar
+    newline
+    if ans == 'y' then
+        play empty O
+    else if ans == 'n' then
+        play empty X
+    else
+        do putStrLn "ERROR: Please input 'y' or 'n'"
+           promptYesNo prompt
+
+newline :: IO ()
+newline = putChar '\n'
